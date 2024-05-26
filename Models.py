@@ -142,6 +142,10 @@ data_dropped_columns.head()
 
 data_dropped_columns.info()
 
+# Insert to output file
+output_file_path = "C:\\Users\\Ale\\OneDrive\\Desktop\\CAPSTONE\\output.csv"
+data_dropped_columns.to_csv(output_file_path, index=False)
+
 # Create a new DataFrame to store the encoded data
 data_encoded = data_dropped_columns.copy()
 
@@ -198,14 +202,12 @@ accuracy = accuracy_score(y_test, y_pred)
 report = classification_report(y_test, y_pred)
 
 print(f'Accuracy: {accuracy}')
-print('Classification Report:')
+print('Presence LR Classification Report:')
 print(report)
 
-
+from sklearn.ensemble import RandomForestClassifier
 # tried a different model
 # random forest classifier
-
-from sklearn.ensemble import RandomForestClassifier
 
 # Create a random forest classifier
 model = RandomForestClassifier()
@@ -213,129 +215,132 @@ model = RandomForestClassifier()
 # Train the model on the training data
 model.fit(X_train, y_train)
 
-# Evaluate the model on the test data
-score = model.score(X_test, y_test)
+# Predict on the test set
+y_pred = model.predict(X_test)
 
-# Print the accuracy of the model
-# print(f"Accuracy: {score}")
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+report = classification_report(y_test, y_pred)
 
-#try to print classification report if possible
-# Print the classification report
-print("Presence RF Classification Report:")
-print(classification_report(y_test, y_pred))
+print(f'Accuracy: {accuracy}')
+print('Presence RF Classification Report:')
+print(report)
 
 # **Biovolume Estimation**
 
 ## **Biovolume Estimation**
 
 
-# Split the data into training and testing sets
-X2 = data_encoded.drop('biovolume', axis=1)
-y2 = data_encoded['biovolume']
-X_train, X_test, y_train, y_test = train_test_split(X2, y2, test_size=0.2, random_state=42)
+# # Split the data into training and testing sets
+# X2 = data_encoded.drop('biovolume', axis=1)
+# y2 = data_encoded['biovolume']
+# X_train, X_test, y_train, y_test = train_test_split(X2, y2, test_size=0.2, random_state=42)
 
-# Rename the variable that overwrites the r2_score function
-my_r2_score = r2_score
+# # Rename the variable that overwrites the r2_score function
+# my_r2_score = r2_score
 
-# Train the model
-model = LinearRegression()
-model.fit(X_train, y_train)
+# # Train the model
+# model = LinearRegression()
+# model.fit(X_train, y_train)
 
-# Predict on the test set
-y_pred = model.predict(X_test)
+# # Predict on the test set
+# y_pred = model.predict(X_test)
 
-# Evaluate the model
-r2_score_ = my_r2_score(y_test, y_pred)
-print(f'R2 Score: {r2_score_}')
+# # Evaluate the model
+# print("Biovolume Linear Regression Model")
+# r2_score_ = my_r2_score(y_test, y_pred)
+# print(f'R2 Score: {r2_score_}')
 
-mse = mean_squared_error(y_test, y_pred)
-print(f'Mean squared error: {mse}')
+# mse = mean_squared_error(y_test, y_pred)
+# print(f'Mean squared error: {mse}')
 
-#TRY TO IMPROVE MODEL
+# #TRY TO IMPROVE MODEL
 
-number_of_features = X_train.shape[1]
+# number_of_features = X_train.shape[1]
 
-print(f"Number of features: {number_of_features}")
-
-#feature importance
-#so we can limit model
-
-import statsmodels.api as sm
-
-# Fit a linear regression model to the data
-model = sm.OLS(y_train, X_train).fit()
-
-# Extract the coefficients from the model
-coefficients = model.params
-
-# Calculate the R^2 for each feature
-r_squared_values = {}
-for feature in X_train.columns:
-    coefficient = coefficients[feature]
-    standard_error = model.bse[feature]
-    r_squared = (coefficient**2) / (coefficient**2 + standard_error**2)
-    r_squared_values[feature] = r_squared
-
-# Rank the features in order of importance
-ranked_features = sorted(r_squared_values, key=r_squared_values.get, reverse=True)
-
-# Print the ranked features
-for feature in ranked_features:
-    print(f"{feature}: {r_squared_values[feature]}")
-
-# Split the data into training and testing sets
-X2 = data_encoded.drop('biovolume', axis=1)
-y2 = data_encoded['biovolume']
-X_train, X_test, y_train, y_test = train_test_split(X2, y2, test_size=0.2, random_state=42)
-
-# Rename the variable that overwrites the r2_score function
-my_r2_score = r2_score
-
-# Train the model
-model = LinearRegression()
-model.fit(X_train, y_train)
-
-# Predict on the test set
-y_pred = model.predict(X_test)
-
-# Evaluate the model
-r2_score_ = my_r2_score(y_test, y_pred)
-print(f'R2 Score: {r2_score_}')
-
-mse = mean_squared_error(y_test, y_pred)
-print(f'Mean squared error: {mse}')
-
-#TRY TO IMPROVE MODEL
-
-number_of_features = X_train.shape[1]
-
-print(f"Number of features: {number_of_features}")
+# print(f"Number of features: {number_of_features}")
 
 #feature importance
 #so we can limit model
 
 import statsmodels.api as sm
 
-# Fit a linear regression model to the data
-model = sm.OLS(y_train, X_train).fit()
+# # Fit a linear regression model to the data
+# model = sm.OLS(y_train, X_train).fit()
 
-# Extract the coefficients from the model
-coefficients = model.params
+# # Extract the coefficients from the model
+# coefficients = model.params
 
-# Calculate the R^2 for each feature
-r_squared_values = {}
-for feature in X_train.columns:
-    coefficient = coefficients[feature]
-    standard_error = model.bse[feature]
-    r_squared = (coefficient**2) / (coefficient**2 + standard_error**2)
-    r_squared_values[feature] = r_squared
+# # Calculate the R^2 for each feature
+# r_squared_values = {}
+# for feature in X_train.columns:
+#     coefficient = coefficients[feature]
+#     standard_error = model.bse[feature]
+#     r_squared = (coefficient**2) / (coefficient**2 + standard_error**2)
+#     r_squared_values[feature] = r_squared
 
-# Rank the features in order of importance
-ranked_features = sorted(r_squared_values, key=r_squared_values.get, reverse=True)
+# # Rank the features in order of importance
+# ranked_features = sorted(r_squared_values, key=r_squared_values.get, reverse=True)
 
-# Print the ranked features
-for feature in ranked_features:
-    print(f"{feature}: {r_squared_values[feature]}")
+# # Print the ranked features
+# for feature in ranked_features:
+#     print(f"{feature}: {r_squared_values[feature]}")
+
+# # Split the data into training and testing sets
+# X2 = data_encoded.drop('biovolume', axis=1)
+# y2 = data_encoded['biovolume']
+# X_train, X_test, y_train, y_test = train_test_split(X2, y2, test_size=0.2, random_state=42)
+
+# # Rename the variable that overwrites the r2_score function
+# my_r2_score = r2_score
+
+# # Train the model
+# model = LinearRegression()
+# model.fit(X_train, y_train)
+
+# # Predict on the test set
+# y_pred = model.predict(X_test)
+
+# print("Biovolume Linear Regression Model Limited Features???")
+
+# # Evaluate the model
+# r2_score_ = my_r2_score(y_test, y_pred)
+# print(f'R2 Score: {r2_score_}')
+
+# mse = mean_squared_error(y_test, y_pred)
+# print(f'Mean squared error: {mse}')
+
+#TRY TO IMPROVE MODEL
+
+# number_of_features = X_train.shape[1]
+
+# print(f"Number of features: {number_of_features}")
+
+# #feature importance
+# #so we can limit model
+
+# import statsmodels.api as sm
+
+# # Fit a linear regression model to the data
+# model = sm.OLS(y_train, X_train).fit()
+
+# # Extract the coefficients from the model
+# coefficients = model.params
+
+# # Calculate the R^2 for each feature
+# r_squared_values = {}
+# for feature in X_train.columns:
+#     coefficient = coefficients[feature]
+#     standard_error = model.bse[feature]
+#     r_squared = (coefficient**2) / (coefficient**2 + standard_error**2)
+#     r_squared_values[feature] = r_squared
+
+# # Rank the features in order of importance
+# ranked_features = sorted(r_squared_values, key=r_squared_values.get, reverse=True)
+
+# # Print the ranked features
+# for feature in ranked_features:
+#     print(f"{feature}: {r_squared_values[feature]}")
 
 #New model using new selected 'imporatant' features
 
@@ -349,27 +354,12 @@ data_encoded2 = data_encoded.copy()
 data_encoded2['biovolume'] = (data_encoded2['biovolume'] > 0).astype(int)
 
 # Prepare the data
-X_important = data_encoded2[['year', 'presence_absence', 'time_seconds', 'net_mesh', 'net_opening', 'lon', 'rank_species', 'day']]
+# X_important = data_encoded2[['year', 'presence_absence', 'time_seconds', 'net_mesh', 'net_opening', 'lon', 'rank_species', 'day']]
+X_important = data_encoded2[['year', 'month', 'lat', 'lon', 'rank_species', 'day']]
 y = data_encoded2[['biovolume']]
 
 X_train, X_test, y_train, y_test = train_test_split(X_important, y, test_size=0.20, random_state=42)
 
-
-
-# Import the appropriate model
-from sklearn.ensemble import RandomForestRegressor
-
-# Create a random forest regressor
-model = RandomForestRegressor()
-
-# Train the model on the training data
-model.fit(X_train, y_train)
-
-# Evaluate the model on the test data
-score = model.score(X_test, y_test)
-
-# Print the accuracy of the model
-print(f"Accuracy: {score}")
 
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
@@ -381,22 +371,21 @@ dtest = xgb.DMatrix(X_test, label=y_test, enable_categorical=True)
 
 # Set parameters for XGBoost
 params = {
-    'objective': 'binary:logistic',  # Binary classification
+    'objective': 'reg:squarederror',  # Regression
     'max_depth': 5,
     'eta': 0.1,
-    'eval_metric': 'logloss'
 }
 
 # Train the model
 bst = xgb.train(params, dtrain, num_boost_round=100)
 
 # Predict on test data
-y_pred_prob = bst.predict(dtest)
-y_pred = [1 if prob > 0.5 else 0 for prob in y_pred_prob]
+y_pred = bst.predict(dtest)
 
-# Evaluate the accuracy
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy}")
+# Evaluate the model
+mse = mean_squared_error(y_test, y_pred)
+print("Biovolume XGB Model")
+print(f"Mean Squared Error: {mse}")
 
 # Optional: Save model
 # bst.save_model('xgb_model.json')
@@ -538,27 +527,30 @@ print(merged_data['both_present'].value_counts())
 
 print(merged_data['presence_absence'].value_counts())
 
-merged_data.to_csv('data_merged_human_jellyfish.csv', index=False)
+# Insert to output file
+merged_data_output_file_path = "C:\\Users\\Ale\\OneDrive\\Desktop\\CAPSTONE\\data_merged_human_jellyfish.csv"
+merged_data.to_csv(merged_data_output_file_path, index=False)
 
 # **RISK ANALYSIS  - HUMAN & JELLYFISH PRESENCE**
 
 # Features and target variable
-X = merged_data[['year', 'month', 'day', 'lat', 'lon', 'net_mesh', 'net_opening', 'time_seconds_x', 'time_seconds_y']]
+# X = merged_data[['year', 'month', 'day', 'lat', 'lon', 'net_mesh', 'net_opening', 'time_seconds_x', 'time_seconds_y']]
+X = merged_data[['year', 'month', 'day', 'lat', 'lon']]
 y = merged_data['both_present']
 
 # Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Initialize and train the model
-model = LogisticRegression()
-model.fit(X_train, y_train)
+# # Initialize and train the model
+# model = LogisticRegression()
+# model.fit(X_train, y_train)
 
-# Make predictions
-y_pred = model.predict(X_test)
+# # Make predictions
+# y_pred = model.predict(X_test)
 
-# Evaluate the model
-print("Accuracy:", accuracy_score(y_test, y_pred))
-print("Classification Report:\n", classification_report(y_test, y_pred))
+# # Evaluate the model
+# print("Accuracy:", accuracy_score(y_test, y_pred))
+# print("Classification Report:\n", classification_report(y_test, y_pred))
 
 #IMPROVE MODEL PERFORMANCE
 
@@ -630,12 +622,3 @@ print("Models saved successfully.")
 
 
 print("the end")
-# # Save the model to a file
-# #risk analysis predictor
-# joblib.dump(best_model, 'best_model.pkl')
-
-# # Save XGBoost biovolume prediction model
-# joblib.dump(bst, 'xgb_model.pkl')
-
-# # Save the presence prediction model to a file
-# joblib.dump(model, 'random_forest_model.pkl')
