@@ -30,6 +30,10 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.svm import SVR
 from sklearn.neural_network import MLPRegressor
 from xgboost import XGBRegressor
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.metrics import accuracy_score, classification_report
+from scipy.stats import randint
 
 # default_data_path= '/content/drive/MyDrive/JeDI.csv'
 default_data_path = "C:\\Users\\Ale\\OneDrive\\Desktop\\CAPSTONE\\JeDI.csv"
@@ -525,81 +529,78 @@ merged_data.head()
 
 print(merged_data['both_present'].value_counts())
 
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import GradientBoostingClassifier
+
 print(merged_data['presence_absence'].value_counts())
 
-# Insert to output file
-merged_data_output_file_path = "C:\\Users\\Ale\\OneDrive\\Desktop\\CAPSTONE\\data_merged_human_jellyfish.csv"
-merged_data.to_csv(merged_data_output_file_path, index=False)
+# # Insert to output file
+# merged_data_output_file_path = "C:\\Users\\Ale\\OneDrive\\Desktop\\CAPSTONE\\data_merged_human_jellyfish.csv"
+# merged_data.to_csv(merged_data_output_file_path, index=False)
 
 # **RISK ANALYSIS  - HUMAN & JELLYFISH PRESENCE**
 
 # Features and target variable
 # X = merged_data[['year', 'month', 'day', 'lat', 'lon', 'net_mesh', 'net_opening', 'time_seconds_x', 'time_seconds_y']]
-X = merged_data[['year', 'month', 'day', 'lat', 'lon']]
-y = merged_data['both_present']
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from scipy.stats import randint
+
+# Load your data (update the path as needed)
+data = pd.read_csv('C:/Users/Ale/OneDrive/Desktop/CAPSTONE/data_merged_human_jellyfish.csv')
+
+# Ensure feature names match
+X = data[['lat', 'lon', 'year', 'month', 'day']]
+y = data['both_present']
 
 # Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# # Initialize and train the model
-# model = LogisticRegression()
-# model.fit(X_train, y_train)
-
-# # Make predictions
-# y_pred = model.predict(X_test)
-
-# # Evaluate the model
-# print("Accuracy:", accuracy_score(y_test, y_pred))
-# print("Classification Report:\n", classification_report(y_test, y_pred))
-
-#IMPROVE MODEL PERFORMANCE
-
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.model_selection import RandomizedSearchCV
-from sklearn.metrics import accuracy_score, classification_report
-from scipy.stats import randint
-
-# Define the Gradient Boosting classifier
-gradient_boosting = GradientBoostingClassifier()
-
-# Define the hyperparameters and their distributions to search
+# Define the Gradient Boosting classifier and hyperparameter search space
 param_dist = {
-    'n_estimators': randint(100, 1000),      # Number of trees in the ensemble
-    'learning_rate': [0.01, 0.05, 0.1, 0.2],  # Learning rate (shrinkage parameter)
-    'max_depth': randint(3, 10),              # Maximum depth of the trees
-    'min_samples_split': randint(2, 10),      # Minimum number of samples required to split an internal node
-    'min_samples_leaf': randint(1, 5)         # Minimum number of samples required to be at a leaf node
+    'n_estimators': randint(100, 1000),
+    'learning_rate': [0.01, 0.05, 0.1, 0.2],
+    'max_depth': randint(3, 10),
+    'min_samples_split': randint(2, 10),
+    'min_samples_leaf': randint(1, 5)
 }
 
-# Perform random search cross-validation
-random_search = RandomizedSearchCV(estimator=gradient_boosting, param_distributions=param_dist, n_iter=10, cv=2, scoring='accuracy', n_jobs=-1)
-random_search.fit(X_train, y_train)  # X_train and y_train are your training data and labels
+# Initialize GradientBoostingClassifier
+gradient_boosting = GradientBoostingClassifier()
 
-# Get the best hyperparameters and the best model
-best_params = random_search.best_params_
+# Perform RandomizedSearchCV
+random_search = RandomizedSearchCV(estimator=gradient_boosting, param_distributions=param_dist, n_iter=10, cv=2, scoring='accuracy', n_jobs=-1)
+random_search.fit(X_train, y_train)
+
+# Get best model and hyperparameters
 best_model = random_search.best_estimator_
+best_params = random_search.best_params_
 
 # Evaluate the best model on the test data
-y_pred = best_model.predict(X_test)  # X_test is your test data
-accuracy = accuracy_score(y_test, y_pred)  # y_test is your test labels
+y_pred = best_model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
 print("Best hyperparameters:", best_params)
 print("Gradient Boosting Test accuracy:", accuracy)
+print("Classification Report:\n", classification_report(y_test, y_pred))
 
-# Print the classification report
-print(classification_report(y_test, y_pred))
+# Filter the test data where the model predicts 0
+predicted_zero = X_test[y_pred == 0]
+print("Data where the model predicts 0:")
+print(predicted_zero)
 
-import sklearn
-print(sklearn.__version__)
+# Check for specific input point that should be 0
+test_input = pd.DataFrame({'lat': [-60.6333333], 'lon': [-25.9], 'year': [1977], 'month': [2], 'day': [28]})
+print("Test input data:")
+print(test_input)
 
-# Specify the latitude and longitude of the location you want to check
-target_lat = 53.95
-target_lon = -166.52
+# Predict on specific input point
+test_prediction = best_model.predict(test_input)
+print("Prediction for specific input:", test_prediction)
 
-# Filter the merged data for the specified location
-location_data = merged_data[(merged_data['lat'] == target_lat) & (merged_data['lon'] == target_lon)]
-
-# Display the filtered data
-print(location_data)
 
 # **SAVE PREDICTIVE MODELS FOR LATER USE**
 import joblib
