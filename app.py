@@ -67,7 +67,7 @@ def main():
     
     # Set the background image
     set_background_image("https://cosmosmagazine.com/wp-content/uploads/2019/12/170510_Larvacean_Thumb.jpg", size='115% 115%')
-    st.image("C:/Users/Ale/OneDrive/Desktop/CAPSTONE/tbD.png", width=200)
+    st.image("tbD.png", width=200)
     st.title('Predictive Models')
 
     le = LabelEncoder()
