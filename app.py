@@ -71,7 +71,7 @@ def main():
     st.title('Predictive Models')
 
     le = LabelEncoder()
-    species_data = pd.read_csv('C:/Users/Ale/OneDrive/Desktop/CAPSTONE/output.csv')
+    species_data = pd.read_csv('output.csv')
     le.fit(species_data['rank_species'])
 
     col1, col2, col3, col4, col5 = st.columns(5)
