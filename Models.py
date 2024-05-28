@@ -146,9 +146,9 @@ data_dropped_columns.head()
 
 data_dropped_columns.info()
 
-# Insert to output file
-output_file_path = "C:\\Users\\Ale\\OneDrive\\Desktop\\CAPSTONE\\output.csv"
-data_dropped_columns.to_csv(output_file_path, index=False)
+# # Insert to output file
+# output_file_path = "C:\\Users\\Ale\\OneDrive\\Desktop\\CAPSTONE\\output.csv"
+# data_dropped_columns.to_csv(output_file_path, index=False)
 
 # Create a new DataFrame to store the encoded data
 data_encoded = data_dropped_columns.copy()
@@ -389,7 +389,19 @@ y_pred = bst.predict(dtest)
 # Evaluate the model
 mse = mean_squared_error(y_test, y_pred)
 print("Biovolume XGB Model")
-print(f"Mean Squared Error: {mse}")
+# Find the maximum and minimum predictions for biovolume
+max_prediction = max(y_pred)
+print(max_prediction)
+min_prediction = min(y_pred)
+print(min_prediction)
+# Find the corresponding data points for the maximum and minimum predictions
+max_data_point = X_test[y_pred == max_prediction]
+min_data_point = X_test[y_pred == min_prediction]
+
+print("Maximum Prediction:")
+print(max_data_point)
+print("Minimum Prediction:")
+print(min_data_point)
 
 # Optional: Save model
 # bst.save_model('xgb_model.json')
