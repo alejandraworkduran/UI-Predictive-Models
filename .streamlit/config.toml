@@ -2,3 +2,6 @@
 backgroundColor="#009db2"
 secondaryBackgroundColor="#009db2"
 textColor="#ffffff"
+
+[layout]
+page_width = "wide"
