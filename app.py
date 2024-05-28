@@ -137,7 +137,7 @@ def main():
                 st.write('Biovolume Prediction in mm3:', biovolume_prediction)
 
     # Display historical data outside of the columns
-    data_merged = pd.read_csv('C:/Users/Ale/OneDrive/Desktop/CAPSTONE/data_merged_human_jellyfish.csv')
+    data_merged = pd.read_csv('data_merged_human_jellyfish.csv')
     location_data = data_merged[(abs(data_merged['lat'] - lat) <= 0.1) & (abs(data_merged['lon'] - lon) <= 0.1)]
     if not location_data.empty:
         st.write('')
